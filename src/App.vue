@@ -16,6 +16,7 @@ import Navbar from "./components/Navbar.vue";
 })
 export default class App extends Vue {
   created() {
+    this.$store.dispatch("deleteSession");
     this.$store.dispatch("createGuestSession");
     this.$store.dispatch("fetchConfig");
   }

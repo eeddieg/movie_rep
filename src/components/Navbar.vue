@@ -9,9 +9,9 @@
           <router-link to="/dashboard">Dashboard</router-link>
         </b-nav-item>
         <b-nav-item-dropdown text="User" left v-show="isAuth">
-          <b-dropdown-item href="#">Account</b-dropdown-item>
-          <b-dropdown-item href="#">Settings</b-dropdown-item>
-          <b-dropdown-item href="#">Logout</b-dropdown-item>
+          <b-dropdown-item to="/dashboard/account">Account</b-dropdown-item>
+          <b-dropdown-item to="#">Settings</b-dropdown-item>
+          <b-dropdown-item @click="logout()">Logout</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item>
           <router-link to="/login" v-show="!isAuth">
@@ -33,7 +33,11 @@ import { mapGetters } from "vuex";
     ...mapGetters(["isAuth"])
   }
 })
-export default class NavbarUser extends Vue {}
+export default class NavbarUser extends Vue {
+  logout() {
+    this.$store.dispatch("logout");
+  }
+}
 </script>
 
 <style scoped>

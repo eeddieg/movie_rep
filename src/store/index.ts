@@ -9,7 +9,13 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   strict: true,
   state: {
+    STATUS: {
+      SUCCESS: 200,
+      UNAUTHORIZED: 7,
+      NOT_FOUND: 34
+    },
     user: {
+      name: "",
       token: ""
     },
     config: {},
@@ -27,6 +33,9 @@ export default new Vuex.Store({
     getConfig: (state) => {
       return state.config;
     },
+    getStatus: (state) => {
+      return state.STATUS;
+    },
     getGenre: (state) => {
       return state.genre;
     },
@@ -38,8 +47,9 @@ export default new Vuex.Store({
     },
   },
   mutations: {
-    SET_USER(state, payload: string) {
-      state.user.token = payload;
+    SET_USER(state, payload: {username: string, token: string}) {
+      state.user.name = payload.username;
+      state.user.token = payload.token;
     },
     SET_CONFIG(state, payload: {}) {
       state.config = payload;
@@ -57,29 +67,25 @@ export default new Vuex.Store({
   },
   actions: {
     async createGuestSession() {
-      const SUCCESS = 200;
+      const STATUS = this.getters.getStatus;
       await axios
         .get(ApiCalls.ACTIONS.GUEST_SESSION)
         .then((res) => {
-          if ((res.status = SUCCESS)) {
+          if ((res.status = STATUS.SUCCESS)) {
             if(res.data.success) {
               localStorage.setItem("guest_session_id", res.data.guest_session_id);
-              localStorage.setItem("expires_at", res.data.expires_at);
+              localStorage.setItem("guest_session_expires_at", res.data.expires_at);
             }
           } 
         })
         .catch((err) => console.log(err));
     },
-    async validateUser({commit}, user) {     
-      const SUCCESS = 200;
-      const STATUS = {
-        UNAUTHORIZED: 7,
-        NOT_FOUND: 34
-      }
+    async validateUser({commit}, user) {
+      const STATUS = this.getters.getStatus;
       await axios
         .get(ApiCalls.ACTIONS.REQUEST_TOKEN)
         .then(res => {
-          if (res.status == SUCCESS){
+          if (res.status == STATUS.SUCCESS){
             if (res.data.success){
               localStorage.setItem("temporary_request_token", res.data.request_token);
             }
@@ -100,7 +106,7 @@ export default new Vuex.Store({
             if (res.data.success) {
               localStorage.removeItem("temporary_request_token");
               localStorage.setItem("session_token", res.data.request_token);
-              localStorage.setItem("expires_at", res.data.expires_at);
+              localStorage.setItem("session_expires_at", res.data.expires_at);
               commit("SET_USER", res.data.request_token);
             } else {
               if (res.data.status_code == STATUS.UNAUTHORIZED) {
@@ -145,11 +151,19 @@ export default new Vuex.Store({
       const baseImgUrl = imageConf[1].base_url + imageConf[1].logo_sizes[4];
       return { imageConf, baseImgUrl };
     },
-    async deleteSession({commit}) {
+    async deleteSession() {
       localStorage.removeItem("guest_session_id");
-      localStorage.removeItem("expires_at");
+      localStorage.removeItem("guest_session_expires_at");
+      localStorage.removeItem("temporary_request_token");
       localStorage.removeItem("session_token");
-      commit("SET_USER", "");
+      localStorage.removeItem("session_expires_at");
+    },
+    async logout() {
+      await this.dispatch("deleteSession");
+      this.commit("SET_USER", {name: "", token: ""} );
+      console.log(this.getters.isAuth);
+      
+      router.push("/");
     }
   },
   modules: {},

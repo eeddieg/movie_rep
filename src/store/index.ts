@@ -10,16 +10,16 @@ export default new Vuex.Store({
   strict: true,
   state: {
     user: {
-      token: "",
+      token: ""
     },
     config: {},
     genre: {},
     trendingMovies: [],
-    discover: {},
+    discover: {}
   },
   getters: {
     isAuth: (state) => {
-      if (JSON.stringify(state.user) === "{}") {
+      if (state.user.token == "") {
         return false;
       }
       return true;
@@ -70,49 +70,73 @@ export default new Vuex.Store({
         })
         .catch((err) => console.log(err));
     },
-    async validateUser({commit}, user) {
+    async validateUser({commit}, user) {     
       const SUCCESS = 200;
+      const STATUS = {
+        UNAUTHORIZED: 7,
+        NOT_FOUND: 34
+      }
       await axios
         .get(ApiCalls.ACTIONS.REQUEST_TOKEN)
         .then(res => {
           if (res.status == SUCCESS){
             if (res.data.success){
-              localStorage.setItem("temporary_request_token", res.data.request_token)
-              commit("SET_USER", res.data.request_token);
+              localStorage.setItem("temporary_request_token", res.data.request_token);
             }
           } else {
             console.log("error");
           }
         })
-        .then(() => {
-          axios.get(ApiCalls.ACTIONS.VALIDATE_WITH_LOGIN)
-        })
         .catch((err) => console.log(err));
+
+        const data = {
+          username: user.username,
+          password: user.password,
+          request_token: localStorage.getItem("temporary_request_token")
+        }
+          
+        await axios.post(ApiCalls.ACTIONS.VALIDATE_WITH_LOGIN, data)
+          .then(res => {
+            if (res.data.success) {
+              localStorage.removeItem("temporary_request_token");
+              localStorage.setItem("session_token", res.data.request_token);
+              localStorage.setItem("expires_at", res.data.expires_at);
+              commit("SET_USER", res.data.request_token);
+            } else {
+              if (res.data.status_code == STATUS.UNAUTHORIZED) {
+                router.replace("/login");
+              } else if (res.data.status_code == STATUS.NOT_FOUND) {
+                router.replace("/login");
+              }
+            }
+            
+          })
+          .catch(err => console.log(err))
     },
     async fetchConfig({ commit }) {
       await axios
         .get(ApiCalls.ACTIONS.CONFIG)
-        .then((res) => commit("SET_CONFIG", res.data))
-        .catch((err) => console.log(err));
+        .then(res => commit("SET_CONFIG", res.data))
+        .catch(err => console.log(err));
       return this.state.config!;
     },
     async queryGenre({ commit }) {
       await axios
         .get(ApiCalls.ACTIONS.GENRE)
-        .then((res) => commit("SET_GENRE", res.data))
-        .catch((err) => console.log(err));
+        .then(res => commit("SET_GENRE", res.data))
+        .catch(err => console.log(err));
     },
     async fetchTrending({ commit }) {
       await axios
         .get(ApiCalls.ACTIONS.TRENDING)
-        .then((res) => commit("SET_TRENDING_MOVIES", res.data.results)) //page 1 out of 10000
-        .catch((err) => console.log(err));
+        .then(res => commit("SET_TRENDING_MOVIES", res.data.results)) //page 1 out of 10000
+        .catch(err => console.log(err));
     },
     async discoverMovies({ commit }) {
       await axios
         .get(ApiCalls.ACTIONS.DISCOVER)
-        .then((res) => commit("SET_DISCOVER_MOVIES", res.data)) //page 1 out of 10000
-        .catch((err) => console.log(err));
+        .then(res => commit("SET_DISCOVER_MOVIES", res.data)) //page 1 out of 10000
+        .catch(err => console.log(err));
       return this.state.discover;
     },
     configImageUrl() {
@@ -121,10 +145,11 @@ export default new Vuex.Store({
       const baseImgUrl = imageConf[1].base_url + imageConf[1].logo_sizes[4];
       return { imageConf, baseImgUrl };
     },
-    async deleteSession() {
+    async deleteSession({commit}) {
       localStorage.removeItem("guest_session_id");
       localStorage.removeItem("expires_at");
-      localStorage.removeItem("temporary_request_token");
+      localStorage.removeItem("session_token");
+      commit("SET_USER", "");
     }
   },
   modules: {},

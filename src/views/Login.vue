@@ -44,7 +44,13 @@ export default class Login extends Vue {
     };
     this.$store
       .dispatch("validateUser", form)
-      .then(() => this.$router.push("/user"))
+      .then(() => {
+        if (this.$store.getters.isAuth) {
+          this.$router.push("/dashboard");
+        } else {
+          this.$router.push("/login");
+        }
+      })
       .catch(err => console.error(err));
   }
 }

@@ -19,7 +19,9 @@ export default class ApiCalls extends Vue {
   }
 
   static ACTIONS = {
+    ACCOUNT: ApiCalls.baseApiUrl + "account?api_key=" + API_KEY,
     CONFIG: ApiCalls.baseApiUrl + "configuration?api_key=" + API_KEY,
+    CREATE_SESSION: ApiCalls.baseApiUrl + "authentication/session/new?api_key=" + API_KEY,
     DELETE_SESSION: ApiCalls.baseApiUrl + "authentication/session?api_key=" + API_KEY,
     DISCOVER: ApiCalls.baseApiUrl + "discover/movie?api_key=" + API_KEY + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1",
     GENRE: ApiCalls.baseApiUrl + "genre/movie/list?api_key=" + API_KEY,

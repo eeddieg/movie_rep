@@ -9,7 +9,7 @@
           <router-link to="/dashboard">Dashboard</router-link>
         </b-nav-item>
         <b-nav-item-dropdown text="User" left v-show="isAuth">
-          <b-dropdown-item to="/dashboard/account">Account</b-dropdown-item>
+          <b-dropdown-item to="/account">Account</b-dropdown-item>
           <b-dropdown-item to="#">Settings</b-dropdown-item>
           <b-dropdown-item @click="logout()">Logout</b-dropdown-item>
         </b-nav-item-dropdown>

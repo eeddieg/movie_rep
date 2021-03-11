@@ -2,7 +2,6 @@
   <b-container>
     <b-card
       no-body
-      style="max-width: 20rem;"
       :img-src="`${account.avatar.tmdb.avatar_path}`"
       img-alt="Image"
       img-top

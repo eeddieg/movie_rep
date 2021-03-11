@@ -2,21 +2,11 @@
   <b-container>
     <h1>Dashboard</h1>
     <hr />
-    <b-card-group>
-      <b-card
-        title="Search"
-        img-src="https://picsum.photos/600/300/?image=25"
-        img-alt="Image"
-        img-top
-        tag="article"
-        class="mb-2"
-      >
-        <b-card-text>Browse reposiroty.</b-card-text>
-        <b-button to="/dashboard/search" variant="primary">Browse</b-button>
-      </b-card>
-    </b-card-group>
+    <b-container>
+      <Search />
+    </b-container>
 
-    <b-card-group columns>
+    <!--     <b-card-group columns>
       <b-card
         title="Movies"
         img-src="https://picsum.photos/600/300/?image=25"
@@ -55,7 +45,7 @@
         <b-card-text>Browse by companies.</b-card-text>
         <b-button to="/companies" variant="primary">Browse</b-button>
       </b-card>
-    </b-card-group>
+    </b-card-group> -->
 
     <router-view />
   </b-container>
@@ -63,7 +53,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-@Component
+import Search from "./Search.vue";
+@Component({
+  components: {
+    Search
+  }
+})
 export default class Dashboard extends Vue {}
 </script>
 

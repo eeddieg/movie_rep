@@ -19,7 +19,8 @@ const routes: Array<RouteConfig> = [
   {
     path: "/register",
     name: "Register",
-    component: () => import(/* webpackChunkName: login */ "../views/Register.vue")
+    component: () =>
+      import(/* webpackChunkName: login */ "../views/Register.vue")
   },
   {
     path: "/dashboard",
@@ -39,7 +40,7 @@ const routes: Array<RouteConfig> = [
         meta: { requiresAuth: true },
         component: () =>
           import(/* webpackChunkName: "search" */ "../views/Search.vue")
-      },
+      }
     ]
   },
   {
@@ -47,7 +48,7 @@ const routes: Array<RouteConfig> = [
     name: "Account",
     component: () =>
       import(/* webpackChunkName: "account" */ "../views/Account.vue"),
-    meta: { requiresAuth: true }      
+    meta: { requiresAuth: true }
   },
   {
     path: "/about",
@@ -63,7 +64,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !store.getters.isAuth) {   
+  if (to.meta.requiresAuth && !store.getters.isAuth) {
     console.log("user not logged in...redirecting to login");
     next("/login");
   } else {

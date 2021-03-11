@@ -122,7 +122,7 @@ export default class Login extends Vue {
   onSubmit() {
     const form = {
       username: this.username,
-      password: this.password,
+      password: this.password
     };
     /* this.$store
       .dispatch("login", form)

@@ -12,43 +12,43 @@ export default new Vuex.Store({
     STATUS: {
       SUCCESS: 200,
       UNAUTHORIZED: 7,
-      NOT_FOUND: 34,
+      NOT_FOUND: 34
     },
     user: {
       name: "",
-      token: "",
+      token: ""
     },
     config: {},
     account: {},
     genre: {},
-    trendingMovies: [],
-    discover: {},
+    trending: {},
+    discover: {}
   },
   getters: {
-    isAuth: (state) => {
+    isAuth: state => {
       if (state.user.token == "") {
         return false;
       }
       return true;
     },
-    getConfig: (state) => {
+    getConfig: state => {
       return state.config;
     },
-    getAccount: (state) => {
+    getAccount: state => {
       return state.account;
     },
-    getStatus: (state) => {
+    getStatus: state => {
       return state.STATUS;
     },
-    getGenre: (state) => {
+    getGenre: state => {
       return state.genre;
     },
-    getTrendingMovies: (state) => {
-      return state.trendingMovies;
+    getTrendingMovies: state => {
+      return state.trending;
     },
-    getDiscover: (state) => {
+    getDiscover: state => {
       return state.discover;
-    },
+    }
   },
   mutations: {
     SET_USER(state, payload: { username: string; token: string }) {
@@ -58,7 +58,6 @@ export default new Vuex.Store({
     SET_ACCOUNT(state, payload: {}) {
       state.account = payload;
       console.log(state.account);
-      
     },
     SET_CONFIG(state, payload: {}) {
       state.config = payload;
@@ -66,20 +65,19 @@ export default new Vuex.Store({
     SET_GENRE(state, payload: []) {
       state.genre = payload;
     },
-    SET_TRENDING_MOVIES(state, payload: any[]) {
-      console.log();
+    SET_TRENDING_MOVIES(state, payload) {
+      state.trending = payload;
     },
     SET_DISCOVER_MOVIES(state, payload) {
-      const resObj: any = {};
       state.discover = payload;
-    },
+    }
   },
   actions: {
     async createGuestSession() {
       const STATUS = this.getters.getStatus;
       await axios
         .get(ApiCalls.ACTIONS.GUEST_SESSION)
-        .then((res) => {
+        .then(res => {
           if ((res.status = STATUS.SUCCESS)) {
             if (res.data.success) {
               localStorage.setItem(
@@ -93,13 +91,13 @@ export default new Vuex.Store({
             }
           }
         })
-        .catch((err) => console.log(err));
+        .catch(err => console.log(err));
     },
     async validateUser({ commit }, user) {
       const STATUS = this.getters.getStatus;
       await axios
         .get(ApiCalls.ACTIONS.REQUEST_TOKEN)
-        .then((res) => {
+        .then(res => {
           if (res.status == STATUS.SUCCESS) {
             if (res.data.success) {
               localStorage.setItem(
@@ -111,17 +109,17 @@ export default new Vuex.Store({
             console.log("error");
           }
         })
-        .catch((err) => console.log(err));
+        .catch(err => console.log(err));
 
       const data = {
         username: user.username,
         password: user.password,
-        request_token: localStorage.getItem("temporary_request_token"),
+        request_token: localStorage.getItem("temporary_request_token")
       };
 
       await axios
         .post(ApiCalls.ACTIONS.VALIDATE_WITH_LOGIN, data)
-        .then((res) => {
+        .then(res => {
           if (res.data.success) {
             localStorage.removeItem("temporary_request_token");
             localStorage.removeItem("guest_session_id");
@@ -134,7 +132,7 @@ export default new Vuex.Store({
 
             axios
               .post(ApiCalls.ACTIONS.CREATE_SESSION, {
-                request_token: localStorage.getItem("request_token"),
+                request_token: localStorage.getItem("request_token")
               })
               .then(res => {
                 localStorage.removeItem("request_token");
@@ -152,7 +150,7 @@ export default new Vuex.Store({
             }
           }
         })
-        .catch((err) => console.log(err));
+        .catch(err => console.log(err));
     },
     async fetchConfig({ commit }) {
       await axios
@@ -162,14 +160,15 @@ export default new Vuex.Store({
       return this.state.config!;
     },
     async fetchAccountInfo({ commit }) {
-      const url = ApiCalls.ACTIONS.ACCOUNT +
-      "&session_id=" + localStorage.getItem("session_id")
-      console.log(url);
-      
-      axios.get(url)
+      const url =
+        ApiCalls.ACTIONS.ACCOUNT +
+        "&session_id=" +
+        localStorage.getItem("session_id");
+
+      axios
+        .get(url)
         .then(res => commit("SET_ACCOUNT", res.data))
         .catch(err => console.log(err));
-
     },
     async queryGenre({ commit }) {
       await axios
@@ -180,8 +179,9 @@ export default new Vuex.Store({
     async fetchTrending({ commit }) {
       await axios
         .get(ApiCalls.ACTIONS.TRENDING)
-        .then(res => commit("SET_TRENDING_MOVIES", res.data.results)) //page 1 out of 10000
+        .then(res => commit("SET_TRENDING_MOVIES", res.data)) //page 1 out of 10000
         .catch(err => console.log(err));
+      return this.state.trending;
     },
     async discoverMovies({ commit }) {
       await axios
@@ -203,16 +203,20 @@ export default new Vuex.Store({
       localStorage.removeItem("session_id");
     },
     async logout({ commit, dispatch }) {
-      const url = ApiCalls.ACTIONS.DELETE_SESSION +
-      "&session_id=" + localStorage.getItem("session_id");
-      await axios.get(url)
+      const url = ApiCalls.ACTIONS.DELETE_SESSION;
+      0;
+      await axios
+        .post(url, {
+          session_id: localStorage.getItem("session_id")
+        })
+        .then(() => console.log())
         .catch(err => console.log("DELETE_SESSION: " + err));
 
       dispatch("deleteSession");
       commit("SET_USER", { name: "", token: "" });
 
       router.push("/");
-    },
+    }
   },
-  modules: {},
+  modules: {}
 });

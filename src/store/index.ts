@@ -19,6 +19,10 @@ export default new Vuex.Store({
       token: ""
     },
     config: {},
+    imageConfig: {
+      baseImgUrl: "",
+      imageConf: []
+    },
     account: {},
     genre: {},
     trending: {},

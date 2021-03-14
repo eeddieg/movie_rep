@@ -93,7 +93,7 @@ import ApiCalls from "@/mixins/apiCalls";
 @Component
 export default class Home extends Vue {
   private tabs = ["Discover movies", "Trending movies"];
-  private selectedTab = "Discover Movies";
+  private selectedTab = "";
   private discover = {
     page: 0,
     movies: []

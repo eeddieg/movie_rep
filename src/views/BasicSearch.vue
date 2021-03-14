@@ -58,7 +58,6 @@
 
 <script lang="ts">
 import ApiCalls from "@/mixins/apiCalls";
-import store from "@/store";
 import axios from "axios";
 import { Component, Vue } from "vue-property-decorator";
 @Component
@@ -85,7 +84,7 @@ export default class BasicSearch extends Vue {
 
   constructor() {
     super();
-    store.dispatch("configImageUrl").then(res => {
+    this.$store.dispatch("configImageUrl").then(res => {
       this.imageConfig.baseImgUrl = res.baseImgUrl;
       this.imageConfig.imageConf = res.imageConf;
     });
@@ -119,6 +118,11 @@ export default class BasicSearch extends Vue {
     this.movie.region = "";
     this.movie.year = "";
     this.movie.primary_release_year = "";
+
+    this.movieQueryResult.page = "";
+    this.movieQueryResult.results = "";
+    this.movieQueryResult.totalPages = "";
+    this.movieQueryResult.totalResults = "";
   }
 }
 </script>
